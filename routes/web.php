@@ -11,6 +11,8 @@
 |
 */
 
+use Illuminate\Support\Facades\Auth;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -23,6 +25,12 @@ Route::group(['namespace' => 'Auth\Controllers'], function (){
 
 Route::get('/home', 'Home\Controllers\HomeController@index')->name('home');
 
+Route::post('/reaction', 'User\Controllers\ReactionController@store');
+
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/houses', 'House\Controllers\ListHousesController@index')->name('houses');
+});
+
+Route::get('/broadcast', function(){
+    event(new \Chord\Domain\User\Events\UserLikedHouse('first'));
 });

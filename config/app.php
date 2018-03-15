@@ -156,7 +156,7 @@ return [
          */
         Chord\App\Providers\AppServiceProvider::class,
         Chord\App\Providers\AuthServiceProvider::class,
-        // Chord\App\Providers\BroadcastServiceProvider::class,
+        Chord\App\Providers\BroadcastServiceProvider::class,
         Chord\App\Providers\EventServiceProvider::class,
         Chord\App\Providers\RouteServiceProvider::class,
 

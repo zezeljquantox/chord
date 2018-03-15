@@ -30,7 +30,9 @@ class ListHousesController extends Controller
         $houses = $this->service->getHouses();
         $userIds = $houses->pluck('user_id')->toArray();
 
-        $res = $this->service->getReactions(auth()->user()->id, $userIds);
-        return view("house.index")->with(['houses' => $houses]);
+        $reactions = $this->service->getReactions(auth()->user()->id, $userIds);
+
+        $mapedReactions = $this->service->mapHousesReactions(auth()->user()->id, $reactions);
+        return view("house.index")->with(['houses' => $houses, 'mapedReactions' => $mapedReactions]);
     }
 }

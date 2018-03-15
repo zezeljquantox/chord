@@ -17,4 +17,9 @@ class HouseRepository extends Repository
     {
         return $this->model->with(['address', 'user'])->paginate($numOfItems);
     }
+
+    public function getUser(int $houseId)
+    {
+        return $this->model->findOrFail($houseId)->user;
+    }
 }
