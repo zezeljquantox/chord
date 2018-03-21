@@ -2,8 +2,8 @@
 
 namespace Chord\Domain\User\Events;
 
+use Chord\Domain\User\Models\Reaction;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -11,19 +11,20 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class UserLikedHouse implements ShouldBroadcast
+class UserReactedOnHouse implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $user;
+    public $reaction;
+
     /**
      * Create a new event instance.
      *
-     * @return void
+     * @param Reaction $reaction
      */
-    public function __construct($user)
+    public function __construct(Reaction $reaction)
     {
-        $this->user = $user;
+        $this->reaction = $reaction;
     }
 
     /**
@@ -34,12 +35,13 @@ class UserLikedHouse implements ShouldBroadcast
     public function broadcastOn()
     {
         //channel
-        return new Channel('user-dusan');
+        return new Channel('user-reacted');
     }
 
     public function broadcastAs()
     {
         //event
-        return 'server.created';
+        return 'UserReactedOnHouse';
     }
+
 }

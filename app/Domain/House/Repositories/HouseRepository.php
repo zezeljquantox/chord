@@ -13,13 +13,18 @@ class HouseRepository extends Repository
         parent::__construct($model);
     }
 
-    public function load($numOfItems): LengthAwarePaginator
+    public function load(int $userId, $numOfItems): LengthAwarePaginator
     {
-        return $this->model->with(['address', 'user'])->paginate($numOfItems);
+        return $this->model->with(['address', 'user'])->where('user_id','!=', $userId)->paginate($numOfItems);
     }
 
     public function getUser(int $houseId)
     {
         return $this->model->findOrFail($houseId)->user;
+    }
+
+    public function find(int $houseId)
+    {
+        return $this->model->with('user')->find($houseId);
     }
 }

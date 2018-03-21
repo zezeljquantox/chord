@@ -14,4 +14,14 @@ class Reaction extends Model
     {
         return NULL;
     }
+
+    public function userA()
+    {
+        return $this->belongsTo(User::class, 'a');
+    }
+
+    public function userB()
+    {
+        return $this->belongsTo(User::class, 'b');
+    }
 }

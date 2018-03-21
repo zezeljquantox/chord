@@ -27,7 +27,7 @@ class ListHousesController extends Controller
 
     public function index()
     {
-        $houses = $this->service->getHouses();
+        $houses = $this->service->getHouses(auth()->user()->id);
         $userIds = $houses->pluck('user_id')->toArray();
 
         $reactions = $this->service->getReactions(auth()->user()->id, $userIds);

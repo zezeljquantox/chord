@@ -15,9 +15,9 @@ class ListHousesService extends Service
         parent::__construct($repository);
     }
 
-    public function getHouses(int $numOfItems = 20): LengthAwarePaginator
+    public function getHouses(int $userId, int $numOfItems = 20): LengthAwarePaginator
     {
-        return $this->repository->load($numOfItems);
+        return $this->repository->load($userId, $numOfItems);
     }
 
     public function getReactions($userId, array $userIds): Collection

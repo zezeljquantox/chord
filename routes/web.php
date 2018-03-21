@@ -13,9 +13,7 @@
 
 use Illuminate\Support\Facades\Auth;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'Home\Controllers\HomeController@dashboard');
 
 Route::group(['namespace' => 'Auth\Controllers'], function (){
     Route::get('login', 'LoginController@showLoginForm')->name('login');
@@ -26,9 +24,13 @@ Route::group(['namespace' => 'Auth\Controllers'], function (){
 Route::get('/home', 'Home\Controllers\HomeController@index')->name('home');
 
 Route::post('/reaction', 'User\Controllers\ReactionController@store');
+Route::delete('/reaction', 'User\Controllers\ReactionController@remove');
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/houses', 'House\Controllers\ListHousesController@index')->name('houses');
+
+    Route::post('/reaction', 'User\Controllers\ReactionController@store');
+    Route::delete('/reaction', 'User\Controllers\ReactionController@remove');
 });
 
 Route::get('/broadcast', function(){

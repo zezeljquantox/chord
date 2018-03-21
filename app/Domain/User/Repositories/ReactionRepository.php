@@ -7,8 +7,16 @@ use Chord\Domain\User\Models\Reaction;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class ReactionRepository
+ * @package Chord\Domain\User\Repositories
+ */
 class ReactionRepository extends Repository
 {
+    /**
+     * ReactionRepository constructor.
+     * @param Reaction $model
+     */
     public function __construct(Reaction $model)
     {
         parent::__construct($model);
@@ -43,6 +51,25 @@ class ReactionRepository extends Repository
             ['a' => $userA, 'b' => $userB],
             ['like' => $action]
         );
+    }
+
+    /**
+     * @param int $userA
+     * @param int $userB
+     * @return mixed
+     */
+    public function getReaction(int $userA, int $userB)
+    {
+        return $this->model->where('a', $userA)->where('b', $userB)->firstOrFail();
+    }
+
+    /**
+     * @param Reaction $reaction
+     * @return bool
+     */
+    public function remove(Reaction $reaction): bool
+    {
+        return $reaction->delete();
     }
 
 }

@@ -159,7 +159,7 @@ return [
         Chord\App\Providers\BroadcastServiceProvider::class,
         Chord\App\Providers\EventServiceProvider::class,
         Chord\App\Providers\RouteServiceProvider::class,
-
+        Chord\App\Providers\ComposerServiceProvider::class
     ],
 
     /*
