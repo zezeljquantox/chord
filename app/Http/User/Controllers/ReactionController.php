@@ -1,6 +1,7 @@
 <?php
 namespace Chord\Http\User\Controllers;
 
+use Chord\Domain\User\Events\OpenChat;
 use Chord\Domain\User\Events\UserReactedOnHouse;
 use Chord\Domain\User\Services\ReactionService;
 use Chord\Http\Controller;
@@ -29,17 +30,18 @@ class ReactionController extends Controller
         $result = $this->service->create($request->house, $request->action, Auth::id());
         $chatEvent = $this->service->isChatAvailable($result);
 
+        event(new UserReactedOnHouse($result));
         if($chatEvent){
-            event(new $chatEvent($result));
-            //event(new UserReactedOnHouse($result));
+            event(new OpenChat(Auth::user(), $result->userB));
         }
+
         return response()->json(['like' => $result->like]);
     }
 
     public function remove(Request $request)
     {
-        $result = $this->service->remove($request->house, Auth::id());
+        $removedUserId = $this->service->remove($request->house, Auth::id());
 
-        return response()->json(['status' => 'ok']);
+        return response()->json(['status' => 'ok', 'user' => $removedUserId]);
     }
 }

@@ -60,16 +60,17 @@ class ReactionRepository extends Repository
      */
     public function getReaction(int $userA, int $userB)
     {
-        return $this->model->where('a', $userA)->where('b', $userB)->firstOrFail();
+        return $this->model->where('a', $userA)->where('b', $userB)->first();
     }
 
     /**
-     * @param Reaction $reaction
+     * @param int $userA
+     * @param int $userB
      * @return bool
      */
-    public function remove(Reaction $reaction): bool
+    public function removeByUsers(int $userA, int $userB): bool
     {
-        return $reaction->delete();
+        return $this->model->where('a', $userA)->where('b', $userB)->delete();
     }
 
 }

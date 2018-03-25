@@ -39,26 +39,23 @@ class ReactionService extends Service
         $oppositeReaction = $this->repository->getReaction($reaction->b, $reaction->a);
         //var_dump($oppositeReaction);
         if($oppositeReaction){
-            /*
-            if($reaction->like == 1 && $oppositeReaction->like ==1){
-                return 'UserLikedHouse';
-            } else {
-                return
+            if($reaction->like == 1 && $oppositeReaction->like == 1){
+                return true;
             }
-            */
-            return "Chord\\Domain\\User\\Events\\UserReactedOnHouse";
         }
-        return '';
+        return false;
     }
 
-    public function remove(int $houseId, int $userId)
+    /**
+     * @param int $houseId
+     * @param int $userId
+     * @return int
+     */
+    public function remove(int $houseId, int $userId): int
     {
         $house = HouseRepository::find($houseId);
-        dd($house);
-        $record = $this->repository->getReaction($userId, $house->user);
-        $this->repository->remove($record);
-
-        return $record;
+        $this->repository->removeByUsers($userId, $house->user->id);
+        return $house->user->id;
     }
 
 }

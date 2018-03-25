@@ -13,16 +13,24 @@
         <!-- Styles -->
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
         <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+        @yield('css')
         <style>
             .moja{
                 position: fixed;
                 right: 10px;
                 height: 100%;
             }
+
             .scroll-box {
                 overflow-y: auto;
                 padding: 1rem
             }
+
+            .left-sidebar{
+                position: fixed;
+                height: 90%;
+            }
+
         </style>
     </head>
     <body>

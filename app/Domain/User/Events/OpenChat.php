@@ -2,36 +2,30 @@
 
 namespace Chord\Domain\User\Events;
 
-use Chord\Domain\User\Models\Reaction;
+use Chord\Domain\User\Models\User;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
-class UserReactedOnHouse implements ShouldBroadcast
+class OpenChat implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $reaction;
+    public $userA;
+    public $userB;
 
     /**
      * Create a new event instance.
      *
-     * @param Reaction $reaction
+     * @param User $userA
+     * @param User $userB
      */
-    public function __construct(Reaction $reaction = null)
+    public function __construct(User $userA, User $userB)
     {
-        if(!is_null($reaction)){
-            $this->reaction = $reaction;
-        }
-    }
-
-    public function setReaction(Reaction $reaction)
-    {
-        $this->reaction = $reaction;
+        $this->userA = $userA;
+        $this->userB = $userB;
     }
 
     /**
@@ -48,7 +42,6 @@ class UserReactedOnHouse implements ShouldBroadcast
     public function broadcastAs()
     {
         //event
-        return 'UserReactedOnHouse';
+        return 'OpenChat';
     }
-
 }
