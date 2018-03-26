@@ -32,7 +32,7 @@
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">{{ $name }}</a>
                         <ul class="dropdown-menu">
                             @foreach($group as $postcode)
-                                <li><a class="postcode" href="#" id="{{ $postcode->id }}">{{ $postcode->postcode }}</a></li>
+                                <li><a class="postcode" href="javascrip:void(0);" id="{{ $postcode->id }}">{{ $postcode->postcode }}</a></li>
                             @endforeach
                         </ul>
                     </li>
@@ -75,4 +75,29 @@
             </table>
         </div>
     </div>
+@endsection
+
+@section('javascript')
+    <script>
+        $("a.postcode").on('click', function(e){
+            e.preventDefault();
+            let id = $(this).attr('id');
+            console.log(id);
+            loadPostcode(id);
+        });
+
+        function loadPostcode(id){
+            axios.get(`/postcodes/${id}`)
+                .then(function (response) {
+                    console.log(response.data);
+                    /*response.data.chat.forEach(function (item){
+                        console.log('item je', item);
+                        showMessage(item.from, item.message);
+                    });*/
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+    </script>
 @endsection

@@ -2,6 +2,7 @@
 
 namespace Chord\Domain\Postcode\Models;
 
+use Chord\Domain\Address\Models\Address;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -10,5 +11,11 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Postcode extends Model
 {
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
 }

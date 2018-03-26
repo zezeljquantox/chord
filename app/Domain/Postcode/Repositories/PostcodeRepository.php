@@ -23,4 +23,9 @@ class PostcodeRepository extends Repository
     {
         return $this->model->select('id', 'postcode')->orderBy('postcode')->get();
     }
+
+    public function getAddresses(Postcode $postcode)
+    {
+        return $postcode->addresses;
+    }
 }

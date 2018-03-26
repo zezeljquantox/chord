@@ -26,6 +26,8 @@ Route::get('/home', 'Home\Controllers\HomeController@index')->name('home');
 Route::post('/reaction', 'User\Controllers\ReactionController@store');
 Route::delete('/reaction', 'User\Controllers\ReactionController@remove');
 
+Route::get('/postcodes/{postcode}', 'Postcode\Controllers\PostcodeController@index');
+
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/houses', 'House\Controllers\ListHousesController@index')->name('houses');
 

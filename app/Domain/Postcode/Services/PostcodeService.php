@@ -3,6 +3,7 @@
 namespace Chord\Domain\Postcode\Services;
 
 use Chord\App\Service;
+use Chord\Domain\Postcode\Models\Postcode;
 use Chord\Domain\Postcode\Repositories\PostcodeRepository;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -29,5 +30,14 @@ class PostcodeService extends Service
         return $this->repository->getAll()->groupBy(function ($postcode, $key) {
             return explode(' ', $postcode['postcode'])[0];
         });
+    }
+
+    public function getPostcodeDetailes(Postcode $postcode)
+    {
+        $addresses = $this->repository->getAddresses($postcode);
+        $formateAddresses = $addresses->map(function ($address) {
+            return $address->print();
+        });
+        dd($formateAddresses);
     }
 }
