@@ -5,6 +5,8 @@ namespace Chord\Domain\Postcode\Services;
 use Chord\App\Service;
 use Chord\Domain\Postcode\Models\Postcode;
 use Chord\Domain\Postcode\Repositories\PostcodeRepository;
+use Facades\Chord\Domain\Postcode\Repositories\BusstopRepository;
+use Facades\Chord\Domain\School\Repositories\SchoolRepository;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
@@ -35,9 +37,29 @@ class PostcodeService extends Service
     public function getPostcodeDetailes(Postcode $postcode)
     {
         $addresses = $this->repository->getAddresses($postcode);
-        $formateAddresses = $addresses->map(function ($address) {
-            return $address->print();
+        $formatedAddresses = $addresses->reduce(function ($formatedAddresses, $address) {
+            $formatedAddresses[$address->id]['name'] = $address->print();
+            return $formatedAddresses;
         });
-        dd($formateAddresses);
+
+        return $formatedAddresses;
+    }
+
+    /**
+     * @param Postcode $postcode
+     * @return mixed
+     */
+    public function getClosestBusstops(Postcode $postcode)
+    {
+        return BusstopRepository::getClosestBusstops($postcode->longitude, $postcode->latitude);
+    }
+
+    /**
+     * @param Postcode $postcode
+     * @return mixed
+     */
+    public function getSchoolsInRange(Postcode $postcode)
+    {
+        return SchoolRepository::getSchoolsInRange($postcode->longitude, $postcode->latitude);
     }
 }

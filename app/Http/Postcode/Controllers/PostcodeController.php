@@ -24,6 +24,9 @@ class PostcodeController extends Controller
     public function index(Postcode $postcode)
     {
         $addresses = $this->service->getPostcodeDetailes($postcode);
-        dd($addresses->toArray());
+        $busstops = $this->service->getClosestBusstops($postcode);
+        $schools = $this->service->getSchoolsInRange($postcode);
+
+        return response()->json(['addresses' => collect($addresses), 'busstops' => $busstops, 'schools' => $schools]);
     }
 }

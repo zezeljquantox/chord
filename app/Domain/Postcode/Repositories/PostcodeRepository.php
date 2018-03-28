@@ -19,13 +19,21 @@ class PostcodeRepository extends Repository
         parent::__construct($model);
     }
 
+    /**
+     * @return mixed
+     */
     public function getAll()
     {
         return $this->model->select('id', 'postcode')->orderBy('postcode')->get();
     }
 
+    /**
+     * @param Postcode $postcode
+     * @return mixed
+     */
     public function getAddresses(Postcode $postcode)
     {
         return $postcode->addresses;
     }
+
 }

@@ -42,34 +42,26 @@
 
         </nav>
     </div>
-        <div class="col-md-5 mx-auto">
+        <div class="col-md-7 mx-auto">
             <table class="table">
                 <thead>
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">First</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">Handle</th>
+                    <th scope="col">5 closest bus stops</th>
+                    <th scope="col">schools in 10 miles radius</th>
+                    <th scope="col">addresses in that postcode</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td>Larry</td>
-                    <td>the Bird</td>
-                    <td>@twitter</td>
+                    <td id="busstops">
+                        <ul></ul>
+                    </td>
+                    <td id="schools">
+                        <ul></ul>
+                    </td>
+                    <td id="addresses">
+                        <ul></ul>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -79,6 +71,9 @@
 
 @section('javascript')
     <script>
+        var busstopsContainer = $("td#busstops > ul");
+        var schoolsContainer = $("td#schools > ul");
+        var addressesContainer = $("td#addresses > ul");
         $("a.postcode").on('click', function(e){
             e.preventDefault();
             let id = $(this).attr('id');
@@ -86,14 +81,25 @@
             loadPostcode(id);
         });
 
+        function populateData(element, data){
+            element.html('');
+            data.forEach(function(item){
+                element.append(`<li>${item.name}</li>`);
+            });
+        }
+
         function loadPostcode(id){
             axios.get(`/postcodes/${id}`)
                 .then(function (response) {
-                    console.log(response.data);
-                    /*response.data.chat.forEach(function (item){
-                        console.log('item je', item);
-                        showMessage(item.from, item.message);
-                    });*/
+                    populateData(busstopsContainer, response.data.busstops);
+                    populateData(schoolsContainer, response.data.schools);
+
+                    let addresses = [];
+                    Object.keys(response.data.addresses).forEach(function(key) {
+                        addresses.push({'name': response.data.addresses[key].name});
+                    });
+
+                    populateData(addressesContainer, addresses);
                 })
                 .catch(function (error) {
                     console.log(error);
