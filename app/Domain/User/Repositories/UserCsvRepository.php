@@ -31,6 +31,8 @@ class UserCsvRepository extends Repository
             FROM users u INNER JOIN houses h ON u.id = h.user_id 
                 INNER JOIN addresses as a ON h.address_id = a.id"
         );
+
+        return collect($users)->groupBy('id');
     }
 
     public function geGivenLikes()
@@ -38,6 +40,8 @@ class UserCsvRepository extends Repository
         $users = DB::select(
             "SELECT count(*) as count, a as id, GROUP_CONCAT(b) FROM likes WHERE `like` = 1 GROUP BY a"
         );
+
+        return collect($users)->groupBy('id');
     }
 
     public function getReceivedLikes()
@@ -45,6 +49,8 @@ class UserCsvRepository extends Repository
         $users = DB::select(
             "SELECT count(*) as count, b as id FROM likes WHERE `like` = 1 GROUP BY b"
         );
+
+        return collect($users)->groupBy('id');
     }
 
     /**
@@ -57,6 +63,8 @@ class UserCsvRepository extends Repository
             ->where('age', '>', $olderThan)
             ->groupBy('user_id')
             ->get();
+
+        return $query->groupBy('id');
     }
 
     public function getUserMatches()
@@ -68,5 +76,31 @@ class UserCsvRepository extends Repository
              WHERE likes1.`like` = 1 AND likes2.`like` = 1 
              GROUP BY likes1.a"
         );
+        return collect($users)->groupBy('id');
+    }
+
+    public function getUserChats()
+    {
+        $chats = DB::select("SELECT DISTINCT `from`, `to` FROM chats");
+        $result = [];
+
+        foreach ($chats as $chat){
+            if(!isset($result[$chat->from]['all'][$chat->to])){
+                $result[$chat->from]['all'][$chat->to] = 1;
+                $result[$chat->from]['all']['count'] = !empty($result[$chat->from]['all']['count']) ? ++$result[$chat->from]['all']['count'] : 1;
+            }
+            if(!isset($result[$chat->to]['all'][$chat->from])){
+                $result[$chat->to]['all'][$chat->from] = 1;
+                $result[$chat->to]['all']['count'] = !empty($result[$chat->to]['all']['count']) ? ++$result[$chat->to]['all']['count'] : 1;
+            }
+
+            if(!isset($result[$chat->to]['unanswered'][$chat->from])){
+                $result[$chat->from]['unanswered'][$chat->to] = 1;
+            } else {
+                unset($result[$chat->to]['unanswered'][$chat->from]);
+            }
+        }
+
+        return $result;
     }
 }

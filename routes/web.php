@@ -11,7 +11,9 @@
 |
 */
 
+use Facades\Chord\Domain\User\Repositories\UserCsvRepository;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 Route::get('/', 'Home\Controllers\HomeController@dashboard');
 
@@ -37,6 +39,22 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/chat', 'User\Controllers\ChatController@getChat');
 });
 
-Route::get('/broadcast', function(){
-    event(new \Chord\Domain\User\Events\UserLikedHouse('first'));
+Route::get('/userchats', function(){
+    $userDetails = UserCsvRepository::getUsersDetails()->toArray();
+
+    /*foreach ($userDetails as $key => $r){
+        var_dump($key, $r[0]);
+    }*/
+
+    $givenLikes = UserCsvRepository::geGivenLikes();
+    $receivedLikes = UserCsvRepository::getReceivedLikes();
+    $matches = UserCsvRepository::getUserMatches();
+    $userChats = UserCsvRepository::getUserChats();//nema indexa 0
+    $numberOfPeople = UserCsvRepository::getPeople();
+    $numberOfOldPeople = UserCsvRepository::getPeople(45);
+    foreach ($numberOfPeople as $key => $r){
+        var_dump($key, $r);
+    }
+
+
 });
