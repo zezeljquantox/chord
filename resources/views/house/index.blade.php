@@ -1,57 +1,44 @@
 @extends('layouts.app')
 
+@section('css')
+    <style>
+        .chat-wrapper { height: calc(100% - 60px); margin-bottom: 10px; }
+
+        .right-sidebar{
+            position: fixed;
+            right: 10px;
+            height: calc(100% - 100px);
+            padding: 15px;
+        }
+
+        .scroll-box {
+            overflow-y: auto;
+            padding: 0 1rem
+        }
+    </style>
+    @endsection
 @section('content')
 
     <div class="container mt-1">
         <div class="row">
         <div class="col-md-8" data-spy="affix">
         @foreach ($houses as $house)
-            <div class="row">
-                <div class="col-md-12">
-            <div id="{{ $house->user->id }}" data-house-id="{{ $house->id }}" class="card mb-3 house">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        {{ $house->address->print() }}
-                    </h5>
-                    <h6 class="card-subtitle mb-2 text-muted">
-                        Tenant: {{ $house->user->name }}
-                    </h6>
-                    @if (!empty($mapedReactions[$house->user->id]['likedByOther']))
-                        <p data-info="likedByOther" class="card-text">User has liked your house</p>
-                    @else
-                        <p data-info="likedByOther" class="card-text"></p>
-                    @endif
-                    <a href="javascript:void(0);" class="btn {{ $mapedReactions[$house->user->id]['like'] ?? 'btn-default' }} btn-like"><i class="far fa-thumbs-up"></i></a>
-                    <a href="javascript:void(0);" class="btn {{ $mapedReactions[$house->user->id]['dislike'] ?? 'btn-default' }} btn-dislike"><i class="far fa-thumbs-down"></i></a>
-                </div>
-            </div>
-                </div>
-                <!--div class="col-md-4">
-                    <div class="card mb-3">
-                        <div class="h-100 card-body">
-                            <input class="form-control form-control-sm" type="text" placeholder="write a message">
-                        </div>
-                </div-->
-            </div>
-
+            @include('house.partials.house', ['house' => $house])
         @endforeach
         {{ $houses->links() }}
         </div>
-        <div id="user-list" class="moja col-md-2 card">
+        <div id="user-list" class="right-sidebar col-md-2 card">
             <div class="h-50 px-0 d-inline-block scroll-box">
                 <div class="list-group">
                 </div>
-                <!--p>"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"</p-->
             </div>
-            <div class="h-50 d-inline-block scroll-box">
-                <input type="text" id="message" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
-                <div id="chat">
-
+            <div class="h-50 d-inline-block">
+                <div class="chat-wrapper scroll-box">
+                    <div id="chat"></div>
                 </div>
+                <input type="text" id="message" class="form-control" placeholder="Type a message" aria-describedby="basic-addon1">
             </div>
-
-
-    </div>
+        </div>
         </div>
     </div>
 
@@ -68,6 +55,7 @@
             $("a.list-group-item").removeClass("active");
             $(this).addClass("active");
             userTo = $(this).attr('id');
+            console.log(userTo);
             messageContainer.html("");
             getChat(userTo);
         });
@@ -86,6 +74,7 @@
 
         socket.on('UserReacted', (data) => {
             if(data.like == 1) {
+                console.log('useru se svidja kuca');
                 $("div#" + data.user).find(`[data-info='likedByOther']`).text("User has liked your house");
             } else {
                 $("div#" + data.user).find(`[data-info='likedByOther']`).text("");
@@ -96,10 +85,45 @@
 
         socket.on('NewUserForChat', (data) => {
             addUserToList(data);
+            showSwapButton(data.id);
         });
 
+        function showSwapButton(id){
+            if($('div#'+id) !== undefined) {
+                $('div#' + id).find('h5.card-title')
+                    .append("<a href='javascript:void(0);' class='btn btn-default btn-info float-right swap-house' title='Swap house'><i class='fas fa-exchange-alt'></i></a>");
+            } else {
+                console.log('ne postoji');
+            }
+        }
+
+        $('div.house').on('click', 'a.swap-house', function(e){
+            e.preventDefault();
+            console.log('pogodio swap');
+            let houseElement = $(this).parents("div.house");
+            let userToSwap = houseElement.attr('id');
+
+            axios.put('/houses/swap', {
+                user: userToSwap
+            })
+            .then(function (response) {
+                console.log(response.data.address, houseElement.find('.card-body .card-title strong').text());
+                houseElement.find('.card-body .card-title strong').text(response.data.address);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        });
+
+        function dismissSwapButton(id){
+            let element = $('div#'+id);
+            if(element !== undefined){
+                element.find('h5.card-title a').remove();
+            }
+        }
+
         socket.on('userAvailable', (data) => {
-            $("#user-list .list-group").find("a#id"+data.id).prepend("<i class='fas fa-circle'></i>&nbsp;");
+            $("#user-list .list-group").find("a#"+data.id).prepend("<i class='fas fa-circle'></i>&nbsp;");
         });
 
         function addUserToList(data){
@@ -110,8 +134,31 @@
             $("#user-list .list-group").append(`<a href="javascript:void(0);" id="${data.id}" class="list-group-item"><span>${data.name}</span></a>`);
         }
 
+        function putUserOffline(id){
+            let element = $("#user-list .list-group #"+id);
+            let content = element.html();
+            console.log(content);
+            if(content === undefined){
+                return;
+            }
+            let index = content.indexOf("<span>");
+            let newValue = content.substr(index, content.length);
+            element.html(newValue);
+        }
+
         socket.on('userDisconnected', (data) => {
-            removeUserFromChat(data.id);
+            putUserOffline(data.id);
+            //removeUserFromChat(data.id);
+        });
+
+        socket.on('UserSwappedHouse', (data) => {
+            console.log(data.user);
+            let element = $('div#'+data.user);
+            if(element === undefined){
+                console.log('nije nasao');
+                return;
+            }
+            element.find('.card-body .card-title strong').text(data.address)
         });
 
         socket.on('disconnect', () => {
@@ -138,7 +185,7 @@
         });
 
         function reactionAdd(element, house, action){
-            axios.post('/reaction', {
+            axios.post('/reactions', {
                 house: house,
                 action: action
             })
@@ -157,17 +204,30 @@
         }
 
         function removeReaction(element, house){
-            axios.delete('/reaction', { data: {  house: house }})
+            axios.delete('/reactions', { data: {  house: house }})
             .then(function (response){
                 if(response.data.status == 'ok'){
                     element.removeClass('btn-success btn-danger');
                     removeUserFromChat(response.data.user);
+                    console.log('removed', response.data.user);
+                    socket.emit('removeUserFromChat', response.data.user);
                 }
             })
             .catch(function (error) {
                 console.log(error);
             });
         }
+
+        socket.on("UserRemovedReaction", (response) => {
+            console.log("UserRemovedReaction", response);
+            let element = $("div#"+response.id);
+            if(element !== undefined){
+                console.log('postoji');
+                element.find('p[data-info="likedByOther"]').text("");
+                removeUserFromChat(response.id);
+            }
+
+        });
 
         $("input#message").on('keypress', function(e){
             if(e.which == 13){
@@ -181,6 +241,9 @@
                     console.log(data);
                     if(userTo == data.to){
                         showMessage(data.from, data.message);
+                        $('#message').val("");
+                        var d = $('#chat');
+                        d.scrollTop(d.prop("scrollHeight"));
                     }
                 });
             }
@@ -196,15 +259,20 @@
 
         function removeUserFromChat(id){
             let element = $("#user-list .list-group").find("a#"+id);
+            if(element === undefined){
+                return;
+            }
             if(element.hasClass("active")){
                 userTo = 0;
                 $("div.chat p").remove();
             }
-            $("#user-list .list-group").find("a#"+id).remove();
+            element.remove();
+
+            dismissSwapButton(id);
         }
 
         function getChat(userId){
-            axios.get('/chat?user='+userId)
+            axios.get('/chats?user='+userId)
                 .then(function (response) {
                     console.log(response.data.chat[0]);
                     response.data.chat.forEach(function (item){

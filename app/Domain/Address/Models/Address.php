@@ -10,7 +10,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Address extends Model
 {
-    public function print()
+    /**
+     * @return string
+     */
+    public function getFullAddressAttribute()
     {
         $fields = [
             trim($this->district),
@@ -24,10 +27,5 @@ class Address extends Model
         $fields = array_filter($fields);
         return implode(', ', $fields);
 
-    }
-
-    private function isFieldEmpty(string $field): string
-    {
-        return $this->{$field} ?? '';
     }
 }

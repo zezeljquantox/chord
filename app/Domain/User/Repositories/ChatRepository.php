@@ -32,7 +32,7 @@ class ChatRepository extends Repository
                 $query->where('to', $userB)
                     ->where('from', $userA);
             })
-            ->orderBy('date', 'desc')
+            ->orderBy('date', 'asc')
             ->take(30)->get();
 
     }

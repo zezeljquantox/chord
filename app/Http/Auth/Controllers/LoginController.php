@@ -4,6 +4,7 @@ namespace Chord\Http\Auth\Controllers;
 
 use Chord\Http\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use \Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -35,5 +36,29 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    /**
+     * Validate the user login request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function validateLogin(Request $request)
+    {
+        $this->validate($request, [
+            $this->username() => 'required|string'
+        ]);
+    }
+
+    /**
+     * Get the needed authorization credentials from the request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    protected function credentials(Request $request)
+    {
+        return $request->only($this->username());
     }
 }

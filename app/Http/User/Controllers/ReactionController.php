@@ -5,6 +5,7 @@ use Chord\Domain\User\Events\OpenChat;
 use Chord\Domain\User\Events\UserReactedOnHouse;
 use Chord\Domain\User\Services\ReactionService;
 use Chord\Http\Controller;
+use Chord\Http\User\Requests\ReactionRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,7 +26,7 @@ class ReactionController extends Controller
         $this->service = $service;
     }
 
-    public function store(Request $request)
+    public function store(ReactionRequest $request)
     {
         $result = $this->service->create($request->house, $request->action, Auth::id());
         $chatEvent = $this->service->isChatAvailable($result);

@@ -37,20 +37,35 @@ class UserCsvRepository extends Repository
 
     public function geGivenLikes()
     {
-        $users = DB::select(
-            "SELECT count(*) as count, a as id, GROUP_CONCAT(b) FROM likes WHERE `like` = 1 GROUP BY a"
+        /*
+         $users = DB::select(
+            "SELECT count(*) as count, a as id, GROUP_CONCAT(b) as users FROM likes WHERE `like` = 1 GROUP BY a"
         );
-
-        return collect($users)->groupBy('id');
+        */
+        $users = DB::table('likes')
+            ->selectRaw('count(*) as count, a as id, GROUP_CONCAT(b) as users')
+            ->where('like', 1)
+            ->groupBy('a')
+            ->get();
+        return $users->groupBy('id');
     }
 
+    /**
+     * @return mixed
+     */
     public function getReceivedLikes()
     {
-        $users = DB::select(
+        /*$users = DB::select(
             "SELECT count(*) as count, b as id FROM likes WHERE `like` = 1 GROUP BY b"
-        );
+        );*/
 
-        return collect($users)->groupBy('id');
+        $users = DB::table('likes')
+            ->selectRaw('count(*) as count, b as id')
+            ->where('like', 1)
+            ->groupBy('b')
+            ->get();
+
+        return $users->groupBy('id');
     }
 
     /**
@@ -81,7 +96,9 @@ class UserCsvRepository extends Repository
 
     public function getUserChats()
     {
-        $chats = DB::select("SELECT DISTINCT `from`, `to` FROM chats");
+        //$chats = DB::select("SELECT DISTINCT `from`, `to` FROM chats");
+        $chats = DB::table('chats')->select('from', 'to')->distinct()->get();
+
         $result = [];
 
         foreach ($chats as $chat){

@@ -4,16 +4,20 @@ namespace Chord\Domain\School\Repositories;
 
 use Chord\App\Repository;
 use Chord\Domain\School\Models\School;
+use Illuminate\Contracts\Cache\Repository as Cache;
 
 class SchoolRepository extends Repository
 {
+    private $cache;
+
     /**
      * SchoolRepository constructor.
      * @param School $model
      */
-    public function __construct(School $model)
+    public function __construct(Cache $cache, School $model)
     {
         parent::__construct($model);
+        $this->cache = $cache;
     }
 
     /**
@@ -24,11 +28,20 @@ class SchoolRepository extends Repository
      */
     public function getSchoolsInRange(float $longitude, float $latitude, int $range = 10)
     {
-        return $this->model->join('postcodes', 'schools.postcode_id', '=', 'postcodes.id')
+        $key = 'postcodes_' . $longitude . $latitude . '_schools';
+
+        if (!$this->cache->has($key)) {
+            $schools = $this->model->join('postcodes', 'schools.postcode_id', '=', 'postcodes.id')
                 ->selectRaw('schools.id, schools.name, ST_DISTANCE_SPHERE(POINT(postcodes.longitude, postcodes.latitude), POINT(?, ?)) * .000621371192 as distance',
                     [$longitude, $latitude])
                 ->groupBy('schools.id')
                 ->having('distance', '<', $range)
                 ->get();
+
+            $this->cache->put($key, $schools, 10);
+            return $schools;
+        }
+
+        return $this->cache->get($key);
     }
 }

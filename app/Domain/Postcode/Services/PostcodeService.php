@@ -38,7 +38,7 @@ class PostcodeService extends Service
     {
         $addresses = $this->repository->getAddresses($postcode);
         $formatedAddresses = $addresses->reduce(function ($formatedAddresses, $address) {
-            $formatedAddresses[$address->id]['name'] = $address->print();
+            $formatedAddresses[$address->id]['name'] = $address->full_address;
             return $formatedAddresses;
         });
 

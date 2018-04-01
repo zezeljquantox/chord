@@ -2,6 +2,7 @@
 
 namespace Chord\Domain\User\Models;
 
+use Chord\Domain\House\Models\House;
 use Chord\Domain\People\Models\People;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -34,5 +35,13 @@ class User extends Authenticatable
     public function people()
     {
         return $this->hasMany(People::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function house()
+    {
+        return $this->hasOne(House::class);
     }
 }
