@@ -10,35 +10,51 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class ListHousesService extends Service
 {
+    /**
+     * ListHousesService constructor.
+     * @param HouseRepository $repository
+     */
     public function __construct(HouseRepository $repository)
     {
         parent::__construct($repository);
     }
 
+    /**
+     * @param int $userId
+     * @param int $numOfItems
+     * @return LengthAwarePaginator
+     */
     public function getHouses(int $userId, int $numOfItems = 20): LengthAwarePaginator
     {
         return $this->repository->load($userId, $numOfItems);
     }
 
-    public function getReactions($userId, array $userIds): Collection
+    /**
+     * @param int $userId
+     * @param array $userIds
+     * @return Collection
+     */
+    public function getReactions(int $userId, array $userIds): Collection
     {
        return ReactionRepository::getUsersReaction($userId, $userIds);
     }
 
-    //ne koristi se
+    //unused
     public function getHousesWithReactions(int $userId)
     {
         $houses = $this->getHouses();
-        //dd($houses->items());
         $userIds = $houses->pluck('user_id')->toArray();
 
         $reactions = $this->getReactions($userId, $userIds);
-        //dd($reactions);
-        $res = $this->mergeHousesAndReactions($houses->items(), $reactions);
-        dd($res);
 
+        $res = $this->mergeHousesAndReactions($houses->items(), $reactions);
     }
 
+    /**
+     * @param $userId
+     * @param $reactions
+     * @return array
+     */
     public function mapHousesReactions($userId, $reactions)
     {
         $mapedReactions = [];
@@ -54,33 +70,7 @@ class ListHousesService extends Service
                 $mapedReactions[$reaction->a]['likedByOther'] = $reaction->like ? 'btn-success' : '';
             }
         });
-        /*
-        foreach ($houses->items() as $key => $house){
-            $reactions->each(function ($reaction) use ($house, $mapedReactions) {
-                var_dump('q',$house->user->id, 'w',$reaction->a, 'e',$reaction->b);
-                if($house->user->id == $reaction->a){
-                    $mapedReactions[$house->id]['like'] = $reaction->like ? 'btn-success' : 'btn-danger';
-                } elseif ($house->user->id == $reaction->b){
-                    $mapedReactions[$house->id]['likedByOther'] = $reaction->like ? 'btn-success' : '';
-                }
-            });
-        }
-        */
-        /*
-        $houses->items()->each(function ($house, $key) use ($houses, $reactions) {
-            $reactions->each(function ($reaction) use ($houses, $key) {
 
-                if($houses[$key]->user->id == $reaction->a){
-
-                   $like = $reaction->like ? 'btn-success' : 'btn-danger';
-                   $houses[$key]->put('like', $like);
-                } elseif ($houses[$key]->user->id == $reaction->b){
-                    $likedByOther = $reaction->like ? 'btn-success' : '';
-                    $houses[$key]->put('likedByOther', $likedByOther);
-                }
-            });
-        });
-*/
         return $mapedReactions;
     }
 }

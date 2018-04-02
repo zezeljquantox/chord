@@ -29,10 +29,12 @@ class UserSwapHouse implements ShouldBroadcast
      * @var User
      */
     public $user;
+
     /**
      * UserSwapHouse constructor.
      * @param House $house
      * @param Address $address
+     * @param User $user
      */
     public function __construct(House $house, Address $address, User $user)
     {

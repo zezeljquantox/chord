@@ -11,6 +11,8 @@
 |
 */
 
+use Facades\Chord\Domain\User\Services\UserCsvService;
+
 Route::get('/', 'Home\Controllers\HomeController@dashboard');
 
 Route::group(['namespace' => 'Auth\Controllers'], function (){
@@ -37,11 +39,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/chats', 'User\Controllers\ChatController@getChat');
 });
 
-/*
+
 Route::get('/userchats', function(){
 
-    $result = UserCsvService::generateCsv('cron/');
-    echo 'gotovo';die();
+    $result = UserCsvService::generateCsv();
+    return 'gotovo';
+    die();
     $userDetails = UserCsvRepository::getUsersDetails()->toArray();
 
     foreach ($userDetails as $key => $r){
@@ -60,4 +63,3 @@ Route::get('/userchats', function(){
 
 
 });
-*/

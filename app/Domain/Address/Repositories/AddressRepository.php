@@ -2,7 +2,7 @@
 
 namespace Chord\Domain\Address\Repositories;
 
-use App\Repository;
+use Chord\App\Repository;
 use Chord\Domain\Address\Models\Address;
 
 /**
@@ -11,6 +11,10 @@ use Chord\Domain\Address\Models\Address;
  */
 class AddressRepository extends Repository
 {
+    /**
+     * AddressRepository constructor.
+     * @param Address $model
+     */
     public function __construct(Address $model)
     {
         parent::__construct($model);

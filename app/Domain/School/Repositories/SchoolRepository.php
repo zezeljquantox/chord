@@ -12,6 +12,7 @@ class SchoolRepository extends Repository
 
     /**
      * SchoolRepository constructor.
+     * @param Cache $cache
      * @param School $model
      */
     public function __construct(Cache $cache, School $model)

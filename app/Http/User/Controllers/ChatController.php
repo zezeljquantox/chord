@@ -23,6 +23,10 @@ class ChatController extends Controller
         $this->service = $service;
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getChat(Request $request)
     {
         $chat = $this->service->getChat(Auth::id(), $request->user);

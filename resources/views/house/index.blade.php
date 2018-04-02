@@ -51,16 +51,16 @@
         var userTo = 0;
         var messageContainer = $("div#chat");
         $("#user-list").on('click', "a.list-group-item", function (){
-            console.log($(this).attr('id'));
             $("a.list-group-item").removeClass("active");
             $(this).addClass("active");
             userTo = $(this).attr('id');
-            console.log(userTo);
             messageContainer.html("");
             getChat(userTo);
         });
 
-        var socket = io("http://chord.test:3000", { query: "user={{ Auth::user()->id }}&name={{ Auth::user()->name }}" });
+        var nodeServer = "{{ env('APP_NODE') }}";
+
+        var socket = io(nodeServer, { query: "user={{ Auth::user()->id }}&name={{ Auth::user()->name }}" });
         socket.on('connect', () => {
             console.log('Connected to server');
             $("#user-list .list-group").html("");
@@ -68,17 +68,14 @@
                 data.forEach(function (item){
                     addUserToList(item);
                 });
-                //console.log(data);
             });
         });
 
         socket.on('UserReacted', (data) => {
             if(data.like == 1) {
-                console.log('useru se svidja kuca');
                 $("div#" + data.user).find(`[data-info='likedByOther']`).text("User has liked your house");
             } else {
                 $("div#" + data.user).find(`[data-info='likedByOther']`).text("");
-                console.log(data.user);
                 removeUserFromChat(data.user);
             }
         });
@@ -92,14 +89,11 @@
             if($('div#'+id) !== undefined) {
                 $('div#' + id).find('h5.card-title')
                     .append("<a href='javascript:void(0);' class='btn btn-default btn-info float-right swap-house' title='Swap house'><i class='fas fa-exchange-alt'></i></a>");
-            } else {
-                console.log('ne postoji');
             }
         }
 
         $('div.house').on('click', 'a.swap-house', function(e){
             e.preventDefault();
-            console.log('pogodio swap');
             let houseElement = $(this).parents("div.house");
             let userToSwap = houseElement.attr('id');
 
@@ -107,7 +101,6 @@
                 user: userToSwap
             })
             .then(function (response) {
-                console.log(response.data.address, houseElement.find('.card-body .card-title strong').text());
                 houseElement.find('.card-body .card-title strong').text(response.data.address);
             })
             .catch(function (error) {
@@ -137,7 +130,6 @@
         function putUserOffline(id){
             let element = $("#user-list .list-group #"+id);
             let content = element.html();
-            console.log(content);
             if(content === undefined){
                 return;
             }
@@ -152,10 +144,8 @@
         });
 
         socket.on('UserSwappedHouse', (data) => {
-            console.log(data.user);
             let element = $('div#'+data.user);
             if(element === undefined){
-                console.log('nije nasao');
                 return;
             }
             element.find('.card-body .card-title strong').text(data.address)
@@ -179,8 +169,6 @@
             if($(this).hasClass('btn-dislike')){
                 var action = 0;
             }
-
-           console.log(id);
             reactionAdd(element, id, action);
         });
 
@@ -209,7 +197,6 @@
                 if(response.data.status == 'ok'){
                     element.removeClass('btn-success btn-danger');
                     removeUserFromChat(response.data.user);
-                    console.log('removed', response.data.user);
                     socket.emit('removeUserFromChat', response.data.user);
                 }
             })
@@ -219,10 +206,8 @@
         }
 
         socket.on("UserRemovedReaction", (response) => {
-            console.log("UserRemovedReaction", response);
             let element = $("div#"+response.id);
             if(element !== undefined){
-                console.log('postoji');
                 element.find('p[data-info="likedByOther"]').text("");
                 removeUserFromChat(response.id);
             }
@@ -231,14 +216,11 @@
 
         $("input#message").on('keypress', function(e){
             if(e.which == 13){
-                console.log(userTo);
                 let message = $(this).val().replace(/(<([^>]+)>)/ig,"").trim();
-                console.log(message);
                 if(message.length <= 0 || userTo == 0){
                     return;
                 }
                 socket.emit('sendMessage', {to : userTo, message: message}, function (data) {
-                    console.log(data);
                     if(userTo == data.to){
                         showMessage(data.from, data.message);
                         $('#message').val("");
@@ -250,8 +232,6 @@
         });
 
         socket.on("newMessage", (data) => {
-            console.log(data);
-            console.log('da li su isti', userTo == data.from, data.from, userTo);
             if(userTo == data.from){
                 showMessage(data.from, data.message);
             }
@@ -274,9 +254,7 @@
         function getChat(userId){
             axios.get('/chats?user='+userId)
                 .then(function (response) {
-                    console.log(response.data.chat[0]);
                     response.data.chat.forEach(function (item){
-                        console.log('item je', item);
                         showMessage(item.from, item.message);
                     });
                 })
@@ -287,13 +265,10 @@
 
         function showMessage(user, message){
             let currentUser = {{ Auth::user()->id }};
-            console.log(user, currentUser, user != currentUser);
             let from = "You";
             if(user != currentUser){
                 from = $("#user-list .list-group").find("a#"+user).text();
-                console.log(from);
             }
-            console.log(`<p>${from}: ${message}</p>`);
             messageContainer.append(`<p>${from}: ${message}</p>`);
 
         }

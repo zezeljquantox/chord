@@ -8,8 +8,16 @@ use Chord\Domain\User\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Class HouseRepository
+ * @package Chord\Domain\House\Repositories
+ */
 class HouseRepository extends Repository
 {
+    /**
+     * HouseRepository constructor.
+     * @param House $model
+     */
     public function __construct(House $model)
     {
         parent::__construct($model);

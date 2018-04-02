@@ -7,53 +7,76 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
 </p>
 
-## About Laravel
+## Installation
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as:
+To run application you need to have installed: PHP 7.2, MySQL 5.7, Nginx/Apache, Redis, npm, node and composer.
+I recommend you to use laravel homestead for this purpose.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Download source code from (https://github.com/zezeljquantox/chord)
 
-Laravel is accessible, yet powerful, providing tools needed for large, robust applications.
+Run composer install.
 
-## Learning Laravel
+Edit .env to match your configuration
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of any modern web application framework, making it a breeze to get started learning the framework.
+Import database from database/dump
 
-If you're not in the mood to read, [Laracasts](https://laracasts.com) contains over 1100 video tutorials on a range of topics including Laravel, modern PHP, unit testing, JavaScript, and more. Boost the skill level of yourself and your entire team by digging into our comprehensive video library.
+Download source code of node server from: (https://github.com/zezeljquantox/chord_node)
 
-## Laravel Sponsors
+Run npm install
 
-We would like to extend our thanks to the following sponsors for helping fund on-going Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell):
+Set mysql database credentials inside mysql_connection.js
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Pulse Storm](http://www.pulsestorm.net/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
+Start server.js : node server.js or use some task runner for node (forever, nodemon)
 
-## Contributing
+Add cron entry to your server:
+```
+* * * * * php /path-to-your-project/artisan schedule:run >> /dev/null 2>&1
+```
+Enjoy, sorry if i missed something.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## About application
 
-## Security Vulnerabilities
+The application consists of two parts. The first part is related to showing information about postcodes (tasks 1 and 2).
+This is home page and unauthenticated users can access to it.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+The second part of application is reserved for authenticated users. After the user logs in,
+  the list of houses will be shown to him. Users can react on houses (like/dislike).
+  When two users like each other's house, a match is created, allowing them to start 
+  messaging each other. Also, they can swap house with other user.
+  If you want to send a message to another user, you first need to select user from the list of available users.
+   This page relies on web sockets, because of that you need to run node server in the background.
+   There is a missing functionality for notifications of newly received messages as well as feature 'seen' for already viewed messages.
+   
+## Application structure
 
-## License
+Backend application have three main parts: App, Domain and Http.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+In App directory you will find core classes, providers, traits and console commands.
+
+In Domain directory are located all modules of application. Each module consists of several parts:
+
+- Models
+- Repositories
+- Services
+- Events
+
+Http directory is responsable for handling requests. it is divided into modules, similar to Domain,
+but with different structure:
+
+- Controllers
+- Requests
+- ViewComposers
+- Exeptions
+
+Communication between laravel and node server is achieved through Redis pub/sub functionality.
+ Beside that Redis is used as cache driver.
+ 
+ There are two commands which should be run every minute. One of them is command for generating csv, and another one is for clean up directory.
+ If you don't run cronjob, csv will be generated on every user request.
+ 
+ You need to have symlink on storage/app/public, so files from that directory can be accessed by clients.
+ 
+ ```
+ php artisan storage:link
+ ```
+  or you can manually create soft link.

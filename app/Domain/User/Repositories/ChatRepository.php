@@ -4,8 +4,11 @@ namespace Chord\Domain\User\Repositories;
 
 use Chord\App\Repository;
 use Chord\Domain\User\Models\Chat;
-use Illuminate\Support\Facades\DB;
 
+/**
+ * Class ChatRepository
+ * @package Chord\Domain\User\Repositories
+ */
 class ChatRepository extends Repository
 {
     /**
@@ -34,6 +37,5 @@ class ChatRepository extends Repository
             })
             ->orderBy('date', 'asc')
             ->take(30)->get();
-
     }
 }

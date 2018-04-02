@@ -66,7 +66,7 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
+            'driver' => 'customUserProvider',
             'model' => Chord\Domain\User\Models\User::class,
         ],
 

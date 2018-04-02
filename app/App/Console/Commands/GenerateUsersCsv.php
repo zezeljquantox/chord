@@ -25,10 +25,11 @@ class GenerateUsersCsv extends Command
      * @var UserCsvService
      */
     protected $service;
+
     /**
      * Create a new command instance.
      *
-     * @return void
+     * @param UserCsvService $service
      */
     public function __construct(UserCsvService $service)
     {

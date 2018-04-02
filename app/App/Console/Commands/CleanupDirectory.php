@@ -25,10 +25,11 @@ class CleanupDirectory extends Command
      * @var Storage
      */
     protected $storage;
+
     /**
      * Create a new command instance.
      *
-     * @return void
+     * @param Storage $storage
      */
     public function __construct(Storage $storage)
     {

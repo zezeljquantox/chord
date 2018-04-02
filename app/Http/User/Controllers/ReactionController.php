@@ -26,6 +26,10 @@ class ReactionController extends Controller
         $this->service = $service;
     }
 
+    /**
+     * @param ReactionRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(ReactionRequest $request)
     {
         $result = $this->service->create($request->house, $request->action, Auth::id());
@@ -39,6 +43,10 @@ class ReactionController extends Controller
         return response()->json(['like' => $result->like]);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function remove(Request $request)
     {
         $removedUserId = $this->service->remove($request->house, Auth::id());
